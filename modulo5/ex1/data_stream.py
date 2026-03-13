@@ -65,7 +65,7 @@ class NumericProcessor(DataProcessor):
         if isinstance(data, (list, Sequence)) and not isinstance(data, str):
             for items in data:
                 self._storage.append(str(items))
-            self._total += 1
+                self._total += 1
         else:
             self._storage.append(str(data))
             self._total += 1
@@ -99,7 +99,7 @@ class TextProcessor(DataProcessor):
 
 
 class LogProcessor(DataProcessor):
-    def __init__() -> None:
+    def __init__(self) -> None:
         super().__init__()
         self._label = "Log processor"
 
@@ -118,10 +118,10 @@ class LogProcessor(DataProcessor):
             raise Exception("Improper log data")
 
         for entry in (data if isinstance(data, list) else [data]):
-            level = level.get("level_log", "")
-            message = message.get("message_log", "")
+            level = entry.get("level_log", "")
+            message = entry.get("message_log", "")
             self._storage.append(f"{level}: {message}")
-        self._total += 1
+            self._total += 1
 
 
 class DataStream:
@@ -139,8 +139,8 @@ class DataStream:
                     proc.ingest(elements)
                     handled = True
                     break
-                if not handled:
-                    print(f"Data strems error can't processor element in stream: {elements}")
+            if not handled:
+                print(f"Data strems error can't processor element in stream: {elements}")
 
     def print_processors_stats(self) -> None:
         print("== DataStream statistics ==")
@@ -151,7 +151,6 @@ class DataStream:
         for proc in self._processor:
             print(f"{proc._label}: total {proc._total} remaining "
                   f"{len(proc._storage)} on processor")
-            return
 
         
 def main() -> None:
@@ -165,26 +164,35 @@ def main() -> None:
     print()
     num_proc = NumericProcessor()
     stream.register_processor(num_proc)
-    txt_proc = TextProcessor()
-    stream.register_processor(txt_proc)    
-
+ 
     batch: list[Any] = ["Hello world", [3.14, -1, 2.71],
-                       [{"log_level": "WARNING", "log_message": "Telnet access! Use ssh instead"}, {"log_level": "INFO", "log_message": "User wil is connected"}],
-                       42, ["Hi", "five"]]
+                        [{"log_level": "WARNING", "log_message": "Telnet access! Use ssh instead"},
+                         {"log_level": "INFO", "log_message": "User wil is connected"}],
+                        42, ["Hi", "five"]]
     print(f"Send first batch of data on stream: {batch}")
     print()
-
+ 
     stream.process_stream(batch)
     stream.print_processors_stats()
     print()
     print("Registering other data processors")
     print()
+    txt_proc = TextProcessor()
+    stream.register_processor(txt_proc)
     logproc = LogProcessor()
     stream.register_processor(logproc)
     print("Send the same batch again")
     stream.process_stream(batch)
     stream.print_processors_stats()
-
+    print()
+    print("Consume some elements from the data processors: Numeric 3, Text 2, Log 1")
+    for _ in range(3):
+        num_proc.output()
+    for _ in range(2):
+        txt_proc.output()
+    for _ in range(1):
+        logproc.output()
+    stream.print_processors_stats()
 
 if __name__ == "__main__":
     main()
