@@ -194,5 +194,6 @@ def main() -> None:
         logproc.output()
     stream.print_processors_stats()
 
+
 if __name__ == "__main__":
     main()
