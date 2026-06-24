@@ -7,7 +7,7 @@
 #   By: marasolo <marasolo@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/06/20 10:16:55 by marasolo            #+#    #+#            #
-#   Updated: 2026/06/22 22:21:31 by marasolo           ###   ########.fr      #
+#   Updated: 2026/06/23 06:55:45 by marasolo           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -112,7 +112,7 @@ def main() -> None:
     print()
     print("Testing Numeric Processor...")
     num_proc = NumericProcessor()
-    print(f" Trying to validate input '42': {num_proc.validate(True)}")
+    print(f" Trying to validate input '42': {num_proc.validate(42)}")
     print(f" Trying to validate input 'Hello': {num_proc.validate("Hello")}")
     print(" Test invalid ingestion of string 'foo' without prior validation:")
     try:
