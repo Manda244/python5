@@ -7,7 +7,7 @@
 #   By: marasolo <marasolo@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/06/23 07:05:10 by marasolo            #+#    #+#            #
-#   Updated: 2026/06/24 15:36:08 by marasolo           ###   ########.fr      #
+#   Updated: 2026/06/25 09:46:54 by marasolo           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -121,7 +121,8 @@ class LogProcessor(DataProcessor):
             level = level.get("level_log", "")
             message = message.get("message_log", "")
             self._storage.append(f"{level}: {message}")
-            self._total += 1
+        self._total += 1
+
 
 class DataStream:
     def __init__(self) -> None:
@@ -164,12 +165,23 @@ def main() -> None:
     print()
     num_proc = NumericProcessor()
     stream.register_processor(num_proc)
+    txt_proc = TextProcessor()
+    stream.register_processor(txt_proc)    
 
     batch: list[Any] = ["Hello world", [3.14, -1, 2.71],
-[{"log_level": "WARNING", "log_message": "Telnet access! Use ssh instead"},
- {"log_level": "INFO", "log_message": "User wil is connected"}], 42, ["Hi", "five"]]
+                       [{"log_level": "WARNING", "log_message": "Telnet access! Use ssh instead"}, {"log_level": "INFO", "log_message": "User wil is connected"}],
+                       42, ["Hi", "five"]]
     print(f"Send first batch of data on stream: {batch}")
+    print()
 
+    stream.process_stream(batch)
+    stream.print_processors_stats()
+    print()
+    print("Registering other data processors")
+    print()
+    logproc = LogProcessor()
+    stream.register_processor(logproc)
+    print("Send the same batch again")
     stream.process_stream(batch)
     stream.print_processors_stats()
 
