@@ -7,7 +7,7 @@
 #   By: marasolo <marasolo@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/06/20 10:16:55 by marasolo            #+#    #+#            #
-#   Updated: 2026/06/23 06:55:45 by marasolo           ###   ########.fr      #
+#   Updated: 2026/06/27 13:18:23 by marasolo           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -101,7 +101,12 @@ class LogProcessor(DataProcessor):
         if not self.validate(data):
             raise Exception("Improper log data")
 
-        for entry in (data if isinstance(data, list) else [data]):
+        if isinstance(data, dict):
+            entries = [data]
+        else:
+            entries = list(data)
+
+        for entry in entries:
             level = entry.get("log_level", "")
             message = entry.get("log_message", "")
             self._storage.append(f"{level}: {message}")
@@ -115,8 +120,9 @@ def main() -> None:
     print(f" Trying to validate input '42': {num_proc.validate(42)}")
     print(f" Trying to validate input 'Hello': {num_proc.validate("Hello")}")
     print(" Test invalid ingestion of string 'foo' without prior validation:")
+    input: Any = "foo"
     try:
-        num_proc.ingest("foo")
+        num_proc.ingest(input)
     except Exception as e:
         print(f" Got exception: {e}")
     data_num = [1, 2, 3, 4, 5]
@@ -126,7 +132,7 @@ def main() -> None:
     print(f" Extracting {extract_count} values...")
     for _ in range(extract_count):
         ranks, values = num_proc.output()
-        print(f"Numeric value {ranks}: {values}")
+        print(f" Numeric value {ranks}: {values}")
 
     print()
     print("Testing Text Processor...")
@@ -149,7 +155,7 @@ def main() -> None:
     print(f" Processing data: {data_log}")
     log_proc.ingest(data_log)
     extract_log = 2
-    print(f"Extracting {extract_log} values...")
+    print(f" Extracting {extract_log} values...")
     for _ in range(extract_log):
         ranks, values = log_proc.output()
         print(f" Log entry {ranks}: {values}")
